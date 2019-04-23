@@ -9,7 +9,7 @@ public class Utils {
 
     public static List<int> GetInitType()
     {
-        var rst = GetCurrentType1();
+        var rst = GetCurrentType();
         List<int> temp = new List<int>();
         foreach (var item in rst)
         {
@@ -33,21 +33,6 @@ public class Utils {
     }
 
     private static List<int> GetCurrentType()
-    {
-        List<int> rst = new List<int>();
-        while (rst.Count < Config.GameType)
-        {
-            var a = UnityEngine.Random.Range(1, Config.MaxType+1);
-            if (!rst.Contains(a))
-            {
-                rst.Add(a);
-            }
-        }
-
-        return rst;
-    }
-
-    private static List<int> GetCurrentType1()
     {
         int[] rst1 = new int[Config.MaxType];
         for (int i = 0; i < rst1.Length; i++)
