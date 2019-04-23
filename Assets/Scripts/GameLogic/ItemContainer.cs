@@ -1,14 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using GameLogic;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace GameUI
 {
-    public class FrameItemView : MonoBehaviour
-    {
+    public class ItemContainer : MonoBehaviour {
 
-        [SerializeField] private GameObject item;
+	[SerializeField] private GameObject item;
 
         [SerializeField] private Transform anchor;
 
@@ -16,13 +16,13 @@ namespace GameUI
 
         private Vector2 _initPosition = Vector2.zero;
         
-        private List<FrameItem> allItems = new List<FrameItem>();
+        private List<ItemUnit> allItems = new List<ItemUnit>();
 
         // Use this for initialization
         void Start()
         {
             InitEvents();
-            _initPosition = anchor.localPosition;
+            _initPosition = Camera.main.ScreenToWorldPoint(new Vector3(100, Screen.height-100, 0));
         }
 
         // Update is called once per frame
@@ -81,10 +81,10 @@ namespace GameUI
                 var id = i;
                 var info = allData[id];
                 var a = info.position;
-                go.transform.localPosition = _initPosition + new Vector2(a.x * 95, -a.y * 110);
-                go.GetComponent<FrameItem>().SetItemInfo(info);
+                go.transform.position = _initPosition + new Vector2(a.x * 0.9f, -a.y * 1.1f);
+                go.GetComponent<ItemUnit>().SetItemInfo(info);
                 
-                allItems.Add(go.GetComponent<FrameItem>());
+                allItems.Add(go.GetComponent<ItemUnit>());
             }
 			engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
         }
@@ -119,6 +119,6 @@ namespace GameUI
             var a = (int) id;
             allItems.Find(t=>t.item.Id == a).Remove();
         }
-    }
+}
 
 }

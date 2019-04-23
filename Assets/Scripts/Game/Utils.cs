@@ -9,7 +9,7 @@ public class Utils {
 
     public static List<int> GetInitType()
     {
-        var rst = GetCurrentType();
+        var rst = GetCurrentType1();
         List<int> temp = new List<int>();
         foreach (var item in rst)
         {
@@ -35,7 +35,6 @@ public class Utils {
     private static List<int> GetCurrentType()
     {
         List<int> rst = new List<int>();
-
         while (rst.Count < Config.GameType)
         {
             var a = UnityEngine.Random.Range(1, Config.MaxType+1);
@@ -48,8 +47,20 @@ public class Utils {
         return rst;
     }
 
+    private static List<int> GetCurrentType1()
+    {
+        int[] rst1 = new int[Config.MaxType];
+        for (int i = 0; i < rst1.Length; i++)
+        {
+            rst1[i] = i+1;
+        }
 
-    public static List<T> RandomSort<T>(List<T> list)
+        var rst2 = RandomSort(rst1);
+        return rst2.GetRange(0, Config.GameType);
+    }
+
+
+    public static List<T> RandomSort<T>(IList<T> list)
     {
         var random = new Random();
 		List<T> newList = new List<T>();

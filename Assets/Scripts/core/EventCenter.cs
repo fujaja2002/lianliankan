@@ -29,4 +29,12 @@ public class EventCenter:Singleton<EventCenter>
             EventActions[key].Invoke(paras);
         }
     }
+
+    public void Off(string key, Action<object> evt)
+    {
+        if (EventActions.ContainsKey(key))
+        {
+            EventActions[key] -= evt;
+        }
+    }
 }
