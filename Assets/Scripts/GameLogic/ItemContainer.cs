@@ -19,7 +19,7 @@ namespace GameUI
         private List<ItemUnit> allItems = new List<ItemUnit>();
 
         // Use this for initialization
-        void Start()
+        public void Init()
         {
             InitEvents();
             _initPosition = Camera.main.ScreenToWorldPoint(new Vector3(100, Screen.height-100, 0));

@@ -5,6 +5,7 @@ using UnityEngine;
 using System.Reflection;
 using fjj.core;
 using GameLogic;
+using GameUI;
 
 public class Game : MonoBehaviour {
 	
@@ -12,6 +13,7 @@ public class Game : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		GameObject.Find("ItemContainer").GetComponent<ItemContainer>().Init();
 		InitializeModule();
 	}
 	
