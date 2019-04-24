@@ -203,60 +203,107 @@ namespace GameLogic{
                 return true;
             }
             List<Vector2> line = new List<Vector2>();
-
-            for (int startx = -1; startx <= Config.width; startx++)
+            if (CheckVertical(aPosition, bPosition, line))
             {
-                line.Clear();
-                for (int i = startx; i != (int)aPosition.x;i=i+GetSetp(startx, (int)aPosition.x))
-                {
-                    var point = new Vector2(i, aPosition.y);
-                    line.Add(point);
-
-                }
-
-                for (int i = startx; i != (int) bPosition.x; i = i + GetSetp(startx, (int) bPosition.x))
-                {
-                    var pointb = new Vector2(i, bPosition.y);
-                    line.Add(pointb);
-                }
-
-                for (var i = (int)aPosition.y; i != (int)bPosition.y;i=i+ GetSetp((int)aPosition.y, (int)bPosition.y))
-                {
-                    var point = new Vector2(startx,  i);
-                    line.Add(point);
-                }
-
-                var rst = CheckLinePoint(line);
-                if (rst)
-                {
-                    return true;
-                }
+                return true;
             }
-            
+            return CheckHorizon(line, aPosition, bPosition);
+        }
+
+        private bool CheckHorizon(List<Vector2> line, Vector2 aPosition, Vector2 bPosition)
+        {
             for (int starty = -1; starty <= Config.height; starty++)
             {
+                bool notIn = true;
                 line.Clear();
-                for (int i = starty; i != (int)aPosition.y;i=i+GetSetp(starty, (int)aPosition.y))
+                for (int i = starty; i != (int) aPosition.y; i = i + GetSetp(starty, (int) aPosition.y))
                 {
                     var point = new Vector2(aPosition.x, i);
-                    line.Add(point);
-
+                    if (CheckPoint(point))
+                        line.Add(point);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }
                 }
 
                 for (int i = starty; i != (int) bPosition.y; i = i + GetSetp(starty, (int) bPosition.y))
                 {
                     var pointb = new Vector2(bPosition.x, i);
-                    line.Add(pointb);
+                    if (CheckPoint(pointb))
+                        line.Add(pointb);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }
                 }
 
-                for (var i = (int)aPosition.x; i != (int)bPosition.x;i=i+ GetSetp((int)aPosition.x, (int)bPosition.x))
+                for (var i = (int) aPosition.x; i != (int) bPosition.x; i = i + GetSetp((int) aPosition.x, (int) bPosition.x))
                 {
-                    var point = new Vector2(i,  starty);
-                    line.Add(point);
+                    var point = new Vector2(i, starty);
+                    if (CheckPoint(point))
+                        line.Add(point);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }
                 }
 
-                var rst = CheckLinePoint(line);
-                if (rst)
+                if (notIn)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool CheckVertical(Vector2 aPosition, Vector2 bPosition, List<Vector2> line)
+        {
+            for (int startx = -1; startx <= Config.width; startx++)
+            {
+                bool notIn = true;
+                line.Clear();
+                for (int i = startx; i != (int) aPosition.x; i = i + GetSetp(startx, (int) aPosition.x))
+                {
+                    var point = new Vector2(i, aPosition.y);
+                    if (CheckPoint(point))
+                        line.Add(point);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }    
+                }
+
+                for (int i = startx; i != (int) bPosition.x; i = i + GetSetp(startx, (int) bPosition.x))
+                {
+                    var pointb = new Vector2(i, bPosition.y);
+                    if (CheckPoint(pointb))
+                        line.Add(pointb);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }
+                }
+
+                for (var i = (int)aPosition.y; i != (int)bPosition.y;i=i+ GetSetp((int)aPosition.y, (int)bPosition.y))
+                {
+                    var point = new Vector2(startx,  i);
+                    if (CheckPoint(point))
+                        line.Add(point);
+                    else
+                    {
+                        notIn = false;
+                        break;
+                    }
+                }
+
+                if (notIn)
                 {
                     return true;
                 }
@@ -271,6 +318,17 @@ namespace GameLogic{
             var rst = (b-a) / abs;
             return rst;
         }
+
+        private bool CheckPoint(Vector2 point)
+        {
+            if (positionItemDic.ContainsKey(point))
+            {
+                return positionItemDic[point].IsRemoved;
+            }
+
+            return true;
+        }
+        
 
         private bool CheckLinePoint(List<Vector2> line)
         {

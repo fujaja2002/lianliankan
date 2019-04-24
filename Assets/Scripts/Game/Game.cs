@@ -13,6 +13,7 @@ public class Game : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+//		Camera.main.orthographicSize = (1200f / 2)/100f;
 		GameObject.Find("ItemContainer").GetComponent<ItemContainer>().Init();
 		InitializeModule();
 	}
