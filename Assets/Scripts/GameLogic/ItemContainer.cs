@@ -19,6 +19,10 @@ namespace GameUI
 
         private List<ItemUnit> allItems = new List<ItemUnit>();
 
+        #region 临时数据
+        private HintIds tempHint;
+        #endregion
+
         // Use this for initialization
         public void Init()
         {
@@ -46,6 +50,12 @@ namespace GameUI
                 Debug.Log("重来");
                 PlayRoomManager.Instance.ReStartGame();
             }
+            
+            if (GUI.Button(new Rect(220, 0, 100, 30), "提示"))
+            {
+                Debug.Log("提示");
+                PlayRoomManager.Instance.Hint();
+            }
 
             var startPosition = Screen.width - 100;
 
@@ -53,6 +63,12 @@ namespace GameUI
             {
                 Debug.Log("退出");
                 Application.Quit();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                Debug.Log("提示");
+                PlayRoomManager.Instance.Hint();
             }
         }
 
@@ -67,6 +83,25 @@ namespace GameUI
             CreateItems();
         }
 
+        public void HintItems(object ids)
+        {
+            ResetHint();
+            var rst = ids as HintIds;
+            tempHint = rst;
+            allItems.Find(t=>t.item.Id == rst.id1).Hint();
+            allItems.Find(t=>t.item.Id ==rst.id2).Hint();   
+        }
+
+        private void  ResetHint()
+        {
+            if (tempHint != null)
+            {
+                allItems.Find(t => t.item.Id == tempHint.id1).Reset();
+                allItems.Find(t => t.item.Id == tempHint.id2).Reset();
+                tempHint = null;
+            }
+        }
+
         public void EndGame(object _)
         {
             engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
@@ -74,6 +109,7 @@ namespace GameUI
 
         private void CreateItems()
         {
+            tempHint = null;
             var allData = PlayRoomManager.Instance.CurrentItems;
 
             for (int i = 0; i < allData.Count; i++)
@@ -111,16 +147,19 @@ namespace GameUI
             EventCenter.Instance.On(Actions.SelectItem, HandleSelect);
             EventCenter.Instance.On(Actions.RemoveItem, HandleRemove);
             EventCenter.Instance.On(Actions.EndGame, EndGame);
+            EventCenter.Instance.On(Actions.Hint,HintItems);
         }
 
         public void HandleSelect(object id)
         {
+            ResetHint();
             var a = (int) id;
             allItems.Find((t => t.item.Id == a)).Refresh();
         }
 
         public void HandleRemove(object id)
         {
+            ResetHint();
             var a = (int) id;
             allItems.Find(t => t.item.Id == a).Remove();
         }

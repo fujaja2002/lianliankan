@@ -16,4 +16,6 @@ public class Actions
 	public const string ReStartGame = "ReStartGame";
 
 	public const string EndGame = "EndGame";
+
+	public const string Hint = "Hint";
 }

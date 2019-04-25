@@ -88,6 +88,8 @@ namespace GameLogic{
 				SelectedOne.Select();
 				SelectedOne = null;
 			}
+
+            availableId1 = availableId2 = 0;
 			AllItemInfo.Clear();
 			CurrentItems.Clear();
 			allPosition.Clear();
@@ -137,8 +139,17 @@ namespace GameLogic{
             else
             {
 				if (CanRemove(id)) {
-					if (CurrentItems.FindAll(t=>!t.IsRemoved).ToList().Count > 0) {
-						Debug.Log("not finish");
+					if (CurrentItems.FindAll(t=>!t.IsRemoved).ToList().Count > 0)
+                    {
+                        Debug.Log("not finish");
+                        if (CheckAvailable())
+                        {
+                            Debug.Log("还可以继续");
+                        }
+                        else
+                        {
+                            Debug.Log("没有可以消除的了");
+                        }
 					}
 					else
 					{
@@ -267,7 +278,7 @@ namespace GameLogic{
             {
                 bool notIn = true;
                 line.Clear();
-                for (int i = startx; i != (int) aPosition.x; i = i + GetSetp(startx, (int) aPosition.x))
+                for (int i =startx; i != (int) aPosition.x; i = i + GetSetp(startx, (int) aPosition.x))
                 {
                     var point = new Vector2(i, aPosition.y);
                     if (CheckPoint(point))
@@ -279,7 +290,7 @@ namespace GameLogic{
                     }    
                 }
 
-                for (int i = startx; i != (int) bPosition.x; i = i + GetSetp(startx, (int) bPosition.x))
+                for (int i =startx ; i != (int) bPosition.x; i = i + GetSetp(startx, (int) bPosition.x))
                 {
                     var pointb = new Vector2(i, bPosition.y);
                     if (CheckPoint(pointb))
@@ -327,6 +338,53 @@ namespace GameLogic{
             }
 
             return true;
+        }
+
+        private int availableId1;
+        private int availableId2;
+        public void Hint()
+        {
+            if (CheckAvailable())
+            {
+                HintIds ids = new HintIds()
+                {
+                    id1 = availableId1,
+                    id2 = availableId2,
+                };
+                EventCenter.Instance.Broad(Actions.Hint, ids);
+                Debug.Log(availableId1);
+                Debug.Log(availableId2);
+            }
+        }
+        
+        public bool CheckAvailable()
+        {
+            availableId1 = availableId2 = 0;
+            var allIds = CurrentItems.Where(t => !t.IsRemoved).Select(t => t.TypeId).Distinct().ToList();
+            foreach (var item in allIds)
+            {
+                var allItems = CurrentItems.FindAll(t => t.TypeId == item && !t.IsRemoved);
+                if (allItems.Count <=1)
+                {
+                    break;
+                }
+                bool hasPairs = false;
+                for (int i = 0; i < allItems.Count-1; i++)
+                {
+                    for (int j = i + 1; j < allItems.Count; j++)
+                    {
+                        if (JudgeRemove(allItems[i], allItems[j]))
+                        {
+                            hasPairs = true;
+                            availableId1 = allItems[i].Id;
+                            availableId2 = allItems[j].Id;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
         
 

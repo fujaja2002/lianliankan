@@ -14,6 +14,8 @@ namespace GameUI
 
         public ItemInfo item;
 
+        public bool isHint;
+
         // Use this for initialization
         void Start ()
         {
@@ -53,7 +55,19 @@ namespace GameUI
                 Icon.sprite = Resources.Load<Sprite>("Sprites/Icon/" + item.TypeId);
             }
         }
-        
+
+        public void Reset()
+        {
+            isHint = false;
+            bg.sprite = Resources.Load<Sprite>("Sprites/40");
+        }
+
+        public void Hint()
+        {
+            isHint = true;
+            bg.sprite = Resources.Load<Sprite>("Sprites/42");
+        }
+
         public void Remove()
         {
             
