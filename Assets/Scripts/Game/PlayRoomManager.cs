@@ -265,6 +265,7 @@ namespace GameLogic{
 
                 if (notIn)
                 {
+                    ShowLine(line);
                     return true;
                 }
             }
@@ -316,6 +317,7 @@ namespace GameLogic{
 
                 if (notIn)
                 {
+                    ShowLine(line);
                     return true;
                 }
             }
@@ -368,14 +370,12 @@ namespace GameLogic{
                 {
                     break;
                 }
-                bool hasPairs = false;
                 for (int i = 0; i < allItems.Count-1; i++)
                 {
                     for (int j = i + 1; j < allItems.Count; j++)
                     {
                         if (JudgeRemove(allItems[i], allItems[j]))
                         {
-                            hasPairs = true;
                             availableId1 = allItems[i].Id;
                             availableId2 = allItems[j].Id;
                             return true;
@@ -386,7 +386,13 @@ namespace GameLogic{
 
             return false;
         }
-        
+
+        private void ShowLine(List<Vector2> line)
+        {
+            
+            var rst = JsonUtility.ToJson(line.Select(t=>ToString()));
+            Debug.Log(rst);
+        }
 
         private bool CheckLinePoint(List<Vector2> line)
         {
