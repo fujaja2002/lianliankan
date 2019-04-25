@@ -6,29 +6,31 @@ using UnityEngine.UI;
 
 namespace GameUI
 {
-    public class ItemContainer : MonoBehaviour {
+    public class ItemContainer : MonoBehaviour
+    {
+        [SerializeField] private GameObject item;
 
-	[SerializeField] private GameObject item;
+        [SerializeField] private Transform engGameBg;
 
-        [SerializeField] private Transform anchor;
-
-		[SerializeField] private Transform engGameBg;
-
-        private Vector2 _initPosition = Vector2.zero;
+        private const float xdistance = 0.9f;
+        private const float ydistance = 1.1f;
         
+        private Vector2 _initPosition = Vector2.zero;
+
         private List<ItemUnit> allItems = new List<ItemUnit>();
 
         // Use this for initialization
         public void Init()
         {
             InitEvents();
-            _initPosition = Camera.main.ScreenToWorldPoint(new Vector3(100, Screen.height-100, 0));
+            var lenth = (Config.width - 1) * xdistance;
+            var height = (Config.height +1 ) * ydistance;
+            _initPosition = new Vector2(-lenth/2, height/2);
         }
 
         // Update is called once per frame
         void Update()
         {
-            
         }
 
         private void OnGUI()
@@ -39,17 +41,19 @@ namespace GameUI
                 PlayRoomManager.Instance.Reset();
             }
 
-			if (GUI.Button(new Rect(110,0,100,30), "重来")){
-				Debug.Log("重来");
-				PlayRoomManager.Instance.ReStartGame();
-			}
-			
-			var startPosition = Screen.width-100;
+            if (GUI.Button(new Rect(110, 0, 100, 30), "重来"))
+            {
+                Debug.Log("重来");
+                PlayRoomManager.Instance.ReStartGame();
+            }
 
-			if (GUI.Button(new Rect(startPosition,0,100,30), "退出游戏")){
-				Debug.Log("退出");
-				Application.Quit();
-			}
+            var startPosition = Screen.width - 100;
+
+            if (GUI.Button(new Rect(startPosition, 0, 100, 30), "退出游戏"))
+            {
+                Debug.Log("退出");
+                Application.Quit();
+            }
         }
 
         public void Initialize(object _)
@@ -61,13 +65,12 @@ namespace GameUI
         {
             DestoryItems();
             CreateItems();
-
         }
 
-		public void EndGame(object _)
-		{
-			engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
-		}
+        public void EndGame(object _)
+        {
+            engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
+        }
 
         private void CreateItems()
         {
@@ -81,12 +84,13 @@ namespace GameUI
                 var id = i;
                 var info = allData[id];
                 var a = info.position;
-                go.transform.position = _initPosition + new Vector2(a.x * 0.9f, -a.y * 1.1f);
+                go.transform.position = _initPosition + new Vector2(a.x * xdistance, -a.y * ydistance);
                 go.GetComponent<ItemUnit>().SetItemInfo(info);
-                
+
                 allItems.Add(go.GetComponent<ItemUnit>());
             }
-			engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
+
+            engGameBg.gameObject.SetActive(PlayRoomManager.Instance.isGameEnd);
         }
 
         private void DestoryItems()
@@ -95,6 +99,7 @@ namespace GameUI
             {
                 Destroy(allItems[i].gameObject);
             }
+
             allItems.Clear();
         }
 
@@ -102,23 +107,22 @@ namespace GameUI
         {
             EventCenter.Instance.On(Actions.InitGame, Initialize);
             EventCenter.Instance.On(Actions.RefreshItem, RefreshItems);
-			EventCenter.Instance.On(Actions.ReStartGame, RefreshItems);
+            EventCenter.Instance.On(Actions.ReStartGame, RefreshItems);
             EventCenter.Instance.On(Actions.SelectItem, HandleSelect);
             EventCenter.Instance.On(Actions.RemoveItem, HandleRemove);
-			EventCenter.Instance.On(Actions.EndGame, EndGame);
+            EventCenter.Instance.On(Actions.EndGame, EndGame);
         }
 
         public void HandleSelect(object id)
         {
             var a = (int) id;
-            allItems.Find((t=>t.item.Id == a)).Refresh();
+            allItems.Find((t => t.item.Id == a)).Refresh();
         }
 
         public void HandleRemove(object id)
         {
             var a = (int) id;
-            allItems.Find(t=>t.item.Id == a).Remove();
+            allItems.Find(t => t.item.Id == a).Remove();
         }
-}
-
+    }
 }
