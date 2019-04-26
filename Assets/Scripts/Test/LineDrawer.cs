@@ -5,6 +5,12 @@ using UnityEngine;
 public class LineDrawer : MonoBehaviour
 {
 	private LineRenderer _lineRenderer;
+
+	private float duration = 0.3f;
+
+	private float showTime;
+
+	private bool isShow;
 	
 	
 
@@ -12,13 +18,12 @@ public class LineDrawer : MonoBehaviour
 	void Awake ()
 	{
 		_lineRenderer = this.GetComponent<LineRenderer>();
-		_lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
 		
-		_lineRenderer.startColor = Color.red;
+		_lineRenderer.startColor = Color.cyan;
 		_lineRenderer.endColor = Color.yellow;
 
-		_lineRenderer.startWidth = 0.02f;
-		_lineRenderer.endWidth = 0.02f;
+		_lineRenderer.startWidth = 0.05f;
+		_lineRenderer.endWidth = 0.05f;
 	}
 
 	public void SetPoint(List<Vector3> pointList)
@@ -28,10 +33,21 @@ public class LineDrawer : MonoBehaviour
 		{
 			_lineRenderer.SetPosition(i, pointList[i]);
 		}
+		isShow = true;
+		showTime = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		if (isShow)
+		{
+			showTime += Time.deltaTime;
+			if (showTime >= duration)
+			{
+				_lineRenderer.positionCount = 0;
+				showTime = 0;
+				isShow = false;
+			}
+		}
 	}
 }

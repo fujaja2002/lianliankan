@@ -175,11 +175,13 @@ namespace GameLogic{
                 }
                 else if (SelectedOne.TypeId == AllItemInfo[id].TypeId)
                 {
-                    if (JudgeRemove(SelectedOne, AllItemInfo[id]))
+                    List<Vector2> a = new List<Vector2>();
+                    if (JudgeRemove(SelectedOne, AllItemInfo[id], a))
                     {
                         AllItemInfo[id].Remove();
                         SelectedOne.Remove();
                         SelectedOne = null;
+                        ShowLine(a);
                         return true;
                     }
                     else
@@ -201,19 +203,25 @@ namespace GameLogic{
             return false;
         }
 
-        private bool JudgeRemove(ItemInfo a, ItemInfo b)
+        private bool JudgeRemove(ItemInfo a, ItemInfo b, List<Vector2> line)
         {
             var aPosition = a.position;
             var bPosition = b.position;
             if (aPosition.x.Equals(bPosition.x)&& Mathf.Abs(aPosition.y -bPosition.y).Equals(1))
             {
+                line.Add(aPosition);
+                line.Add(bPosition);
+
                 return true;
             }
             if (aPosition.y.Equals(bPosition.y)&& Mathf.Abs(aPosition.x -bPosition.x).Equals(1))
             {
+                line.Add(aPosition);
+                line.Add(bPosition);
+
                 return true;
             }
-            List<Vector2> line = new List<Vector2>();
+
             if (CheckVertical(aPosition, bPosition, line))
             {
                 return true;
@@ -231,7 +239,7 @@ namespace GameLogic{
                 {
                     var point = new Vector2(aPosition.x, i);
                     if (CheckPoint(point))
-                        line.Add(point);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -243,7 +251,7 @@ namespace GameLogic{
                 {
                     var pointb = new Vector2(bPosition.x, i);
                     if (CheckPoint(pointb))
-                        line.Add(pointb);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -255,7 +263,7 @@ namespace GameLogic{
                 {
                     var point = new Vector2(i, starty);
                     if (CheckPoint(point))
-                        line.Add(point);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -265,7 +273,10 @@ namespace GameLogic{
 
                 if (notIn)
                 {
-                    ShowLine(line);
+                    line.Add(aPosition);
+                    line.Add(new Vector2(aPosition.x, starty));
+                    line.Add(new Vector2(bPosition.x,starty));
+                    line.Add(bPosition);
                     return true;
                 }
             }
@@ -283,7 +294,7 @@ namespace GameLogic{
                 {
                     var point = new Vector2(i, aPosition.y);
                     if (CheckPoint(point))
-                        line.Add(point);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -295,7 +306,7 @@ namespace GameLogic{
                 {
                     var pointb = new Vector2(i, bPosition.y);
                     if (CheckPoint(pointb))
-                        line.Add(pointb);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -307,7 +318,7 @@ namespace GameLogic{
                 {
                     var point = new Vector2(startx,  i);
                     if (CheckPoint(point))
-                        line.Add(point);
+                        continue;
                     else
                     {
                         notIn = false;
@@ -317,7 +328,10 @@ namespace GameLogic{
 
                 if (notIn)
                 {
-                    ShowLine(line);
+                    line.Add(aPosition);
+                    line.Add(new Vector2(startx, aPosition.y));
+                    line.Add(new Vector2(startx,bPosition.y));
+                    line.Add(bPosition);
                     return true;
                 }
             }
@@ -363,6 +377,7 @@ namespace GameLogic{
         {
             availableId1 = availableId2 = 0;
             var allIds = CurrentItems.Where(t => !t.IsRemoved).Select(t => t.TypeId).Distinct().ToList();
+            List<Vector2> line = new List<Vector2>();
             foreach (var item in allIds)
             {
                 var allItems = CurrentItems.FindAll(t => t.TypeId == item && !t.IsRemoved);
@@ -374,7 +389,7 @@ namespace GameLogic{
                 {
                     for (int j = i + 1; j < allItems.Count; j++)
                     {
-                        if (JudgeRemove(allItems[i], allItems[j]))
+                        if (JudgeRemove(allItems[i], allItems[j], line))
                         {
                             availableId1 = allItems[i].Id;
                             availableId2 = allItems[j].Id;
@@ -389,9 +404,8 @@ namespace GameLogic{
 
         private void ShowLine(List<Vector2> line)
         {
-            
-            var rst = JsonUtility.ToJson(line.Select(t=>ToString()));
-            Debug.Log(rst);
+            line.ForEach((a) => Debug.Log(a));
+            EventCenter.Instance.Broad(Actions.ShowLine,line);
         }
 
         private bool CheckLinePoint(List<Vector2> line)

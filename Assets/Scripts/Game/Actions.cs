@@ -18,4 +18,6 @@ public class Actions
 	public const string EndGame = "EndGame";
 
 	public const string Hint = "Hint";
+
+	public const string ShowLine = "ShowLine";
 }

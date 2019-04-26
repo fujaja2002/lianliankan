@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using GameLogic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,6 +15,8 @@ namespace GameUI
 
         private const float xdistance = 0.9f;
         private const float ydistance = 1.1f;
+
+        private LineDrawer _line;
         
         private Vector2 _initPosition = Vector2.zero;
 
@@ -51,7 +54,7 @@ namespace GameUI
                 PlayRoomManager.Instance.ReStartGame();
             }
             
-            if (GUI.Button(new Rect(220, 0, 100, 30), "提示"))
+            if (GUI.Button(new Rect(220, 0, 160, 30), "提示(数字3)"))
             {
                 Debug.Log("提示");
                 PlayRoomManager.Instance.Hint();
@@ -148,6 +151,19 @@ namespace GameUI
             EventCenter.Instance.On(Actions.RemoveItem, HandleRemove);
             EventCenter.Instance.On(Actions.EndGame, EndGame);
             EventCenter.Instance.On(Actions.Hint,HintItems);
+            EventCenter.Instance.On(Actions.ShowLine, ShowLine);
+        }
+
+        public void ShowLine(object line)
+        {
+            List<Vector2> rst = line as List<Vector2>;
+            if (_line == null) 
+            {
+                var a = Instantiate(Resources.Load("line")) as GameObject;
+                _line = a.GetComponent<LineDrawer>();
+            }
+            
+            _line.SetPoint(rst.Select(o=>new Vector3(_initPosition.x +o.x*xdistance,_initPosition.y-o.y*ydistance,0)).ToList());   
         }
 
         public void HandleSelect(object id)
