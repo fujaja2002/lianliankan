@@ -19,6 +19,7 @@ namespace GameLogic{
         public Dictionary<Vector2, ItemInfo> positionItemDic = new Dictionary<Vector2, ItemInfo>();
 
 
+        
         private ItemInfo SelectedOne;
 
 		public bool isGameEnd{get;private set;}

@@ -70,8 +70,9 @@ namespace GameUI
 
         public void Remove()
         {
-            
-            this.gameObject.SetActive(false);
+            this.GetComponent<BoxCollider2D>().enabled = false;
+            this.GetComponent<Animator>().enabled = true;
+            //this.gameObject.SetActive(false);
         }
         
         public void HandleOnClick()
