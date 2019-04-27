@@ -6,7 +6,7 @@ public class LineDrawer : MonoBehaviour
 {
 	private LineRenderer _lineRenderer;
 
-	private float duration = 0.3f;
+	private float duration = 0.35f;
 
 	private float showTime;
 
