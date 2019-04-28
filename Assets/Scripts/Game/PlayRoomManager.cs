@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using fjj.core;
+using NUnit.Framework.Internal.Builders;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,8 +20,6 @@ namespace GameLogic{
         
         public Dictionary<Vector2, ItemInfo> positionItemDic = new Dictionary<Vector2, ItemInfo>();
 
-
-        
         private ItemInfo SelectedOne;
 
 		public bool isGameEnd{get;private set;}
@@ -223,118 +223,85 @@ namespace GameLogic{
                 return true;
             }
 
-            if (CheckVertical(aPosition, bPosition, line))
+            if (CheckLine(aPosition, bPosition, line, true))
             {
                 return true;
             }
-            return CheckHorizon(line, aPosition, bPosition);
+            return CheckLine(aPosition, bPosition, line,false);
         }
 
-        private bool CheckHorizon(List<Vector2> line, Vector2 aPosition, Vector2 bPosition)
+
+
+        private bool CheckLine(Vector2 aPosition, Vector2 bPosition, List<Vector2> line, bool vertical)
         {
-            for (int starty = -1; starty <= Config.height; starty++)
+            int start = -1;
+            int end = vertical ? Config.width : Config.height;
+            
+            for (int location = start; location <= end; location++)
             {
-                bool notIn = true;
-                line.Clear();
-                for (int i = starty; i != (int) aPosition.y; i = i + GetSetp(starty, (int) aPosition.y))
+                if (vertical)
                 {
-                    var point = new Vector2(aPosition.x, i);
-                    if (CheckPoint(point))
-                        continue;
-                    else
+                    line.Clear();
+                    for (int i =location; i != (int) aPosition.x; i = i + GetSetp(location, (int) aPosition.x))
                     {
-                        notIn = false;
-                        break;
+                        var point = new Vector2(i, aPosition.y);
+                        if (!CheckPoint(point))
+                            goto End;   
                     }
-                }
 
-                for (int i = starty; i != (int) bPosition.y; i = i + GetSetp(starty, (int) bPosition.y))
-                {
-                    var pointb = new Vector2(bPosition.x, i);
-                    if (CheckPoint(pointb))
-                        continue;
-                    else
+                    for (int i =location ; i != (int) bPosition.x; i = i + GetSetp(location, (int) bPosition.x))
                     {
-                        notIn = false;
-                        break;
+                        var pointb = new Vector2(i, bPosition.y);
+                        if (!CheckPoint(pointb))
+                            goto End;
                     }
-                }
 
-                for (var i = (int) aPosition.x; i != (int) bPosition.x; i = i + GetSetp((int) aPosition.x, (int) bPosition.x))
-                {
-                    var point = new Vector2(i, starty);
-                    if (CheckPoint(point))
-                        continue;
-                    else
+                    for (var i = (int)aPosition.y; i != (int)bPosition.y;i=i+ GetSetp((int)aPosition.y, (int)bPosition.y))
                     {
-                        notIn = false;
-                        break;
+                        var point = new Vector2(location,  i);
+                        if (!CheckPoint(point))
+                            goto End;
                     }
-                }
 
-                if (notIn)
-                {
                     line.Add(aPosition);
-                    line.Add(new Vector2(aPosition.x, starty));
-                    line.Add(new Vector2(bPosition.x,starty));
+                    line.Add(new Vector2(location, aPosition.y));
+                    line.Add(new Vector2(location,bPosition.y));
+                    line.Add(bPosition);
+                    return true;
+
+                }
+                else
+                {
+                    line.Clear();
+                    for (int i = location; i != (int) aPosition.y; i = i + GetSetp(location, (int) aPosition.y))
+                    {
+                        var point = new Vector2(aPosition.x, i);
+                        if (!CheckPoint(point))
+                            goto End;
+                    }
+
+                    for (int i = location; i != (int) bPosition.y; i = i + GetSetp(location, (int) bPosition.y))
+                    {
+                        var pointb = new Vector2(bPosition.x, i);
+                        if (!CheckPoint(pointb))
+                            goto End;
+                    }
+
+                    for (var i = (int) aPosition.x; i != (int) bPosition.x; i = i + GetSetp((int) aPosition.x, (int) bPosition.x))
+                    {
+                        var point = new Vector2(i, location);
+                        if (!CheckPoint(point))
+                            goto End;
+                    }
+                
+                    line.Add(aPosition);
+                    line.Add(new Vector2(aPosition.x, location));
+                    line.Add(new Vector2(bPosition.x,location));
                     line.Add(bPosition);
                     return true;
                 }
-            }
-
-            return false;
-        }
-
-        private bool CheckVertical(Vector2 aPosition, Vector2 bPosition, List<Vector2> line)
-        {
-            for (int startx = -1; startx <= Config.width; startx++)
-            {
-                bool notIn = true;
-                line.Clear();
-                for (int i =startx; i != (int) aPosition.x; i = i + GetSetp(startx, (int) aPosition.x))
-                {
-                    var point = new Vector2(i, aPosition.y);
-                    if (CheckPoint(point))
-                        continue;
-                    else
-                    {
-                        notIn = false;
-                        break;
-                    }    
-                }
-
-                for (int i =startx ; i != (int) bPosition.x; i = i + GetSetp(startx, (int) bPosition.x))
-                {
-                    var pointb = new Vector2(i, bPosition.y);
-                    if (CheckPoint(pointb))
-                        continue;
-                    else
-                    {
-                        notIn = false;
-                        break;
-                    }
-                }
-
-                for (var i = (int)aPosition.y; i != (int)bPosition.y;i=i+ GetSetp((int)aPosition.y, (int)bPosition.y))
-                {
-                    var point = new Vector2(startx,  i);
-                    if (CheckPoint(point))
-                        continue;
-                    else
-                    {
-                        notIn = false;
-                        break;
-                    }
-                }
-
-                if (notIn)
-                {
-                    line.Add(aPosition);
-                    line.Add(new Vector2(startx, aPosition.y));
-                    line.Add(new Vector2(startx,bPosition.y));
-                    line.Add(bPosition);
-                    return true;
-                }
+                End:
+                continue;
             }
 
             return false;
